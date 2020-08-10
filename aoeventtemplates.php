@@ -350,28 +350,10 @@ function aoeventtemplates_civicrm_validateForm($formName, &$fields, &$files, &$f
     if (!empty($templateId)) {
       $totalNumber = 0;
       $flag = TRUE;
-      if ($templateId == SLOZOOEVENT) {
-        $priceFields = [
-          'price_192',
-          'price_193',
-          'price_194',
-        ];
-      }
-      elseif ($templateId == SLOVAREVENT) {
-        $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $form->_eventId);
-        $priceFieldIds = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_price_field WHERE price_set_id = %1", [1 => [$priceSetId, "Integer"]])->fetchAll();
-        foreach ($priceFieldIds as $priceFids) {
-          $priceFields[] = 'price_' . $priceFids['id']; 
-        }
-      }
-      else {
-        $priceFields = [
-          'price_24',
-          'price_36',
-          'price_37',
-          'price_38',
-          'price_39',
-        ];
+      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $form->_eventId);
+      $priceFieldIds = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_price_field WHERE price_set_id = %1", [1 => [$priceSetId, "Integer"]])->fetchAll();
+      foreach ($priceFieldIds as $priceFids) {
+        $priceFields[] = 'price_' . $priceFids['id'];
       }
       foreach ($priceFields as $price) {
         if (!empty($fields[$price])) {
@@ -380,6 +362,7 @@ function aoeventtemplates_civicrm_validateForm($formName, &$fields, &$files, &$f
             $totalNumber += $fields[$price];
           }
           $flag = FALSE;
+          break;
         }
       }
       if ($totalNumber > 4) {
@@ -389,7 +372,7 @@ function aoeventtemplates_civicrm_validateForm($formName, &$fields, &$files, &$f
         $errors['_qf_default'] = ts("Free Caregivers must be equal to or less than # or tickets for children with ASD.");
       }
       if ($flag) {
-        $errors['_qf_default'] = ts("Please select atleast one of the ticket options.");
+        $errors['_qf_default'] = ts("Please select at least one of the ticket options.");
       }
     }
   }
